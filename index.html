@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jogos das Crianças</title>
+<style>
+  :root{
+    --bg:#0f1220; --bg2:#171b2e; --card:#1e2338; --line:#2c3350;
+    --tx:#eef1f8; --tx2:#9aa3bf; --accent:#7ed321;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f4f6fb; --bg2:#eaeef7; --card:#ffffff; --line:#dde3f0;
+           --tx:#141827; --tx2:#5c6480; }
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; padding:0; min-height:100vh; background:var(--bg); color:var(--tx);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-text-size-adjust:100%;
+  }
+  header{
+    padding:32px 20px 20px; text-align:center;
+    background:linear-gradient(180deg,var(--bg2),var(--bg));
+    border-bottom:1px solid var(--line);
+  }
+  h1{ margin:0; font-size:clamp(24px,6vw,38px); letter-spacing:-.5px; }
+  header p{ margin:8px 0 0; color:var(--tx2); font-size:15px; }
+  .filtros{
+    display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+    padding:16px 20px 0; max-width:1100px; margin:0 auto;
+  }
+  .filtros button{
+    border:1px solid var(--line); background:var(--card); color:var(--tx2);
+    padding:8px 16px; border-radius:999px; font-size:14px; cursor:pointer;
+    font-family:inherit;
+  }
+  .filtros button[aria-pressed="true"]{
+    background:var(--accent); border-color:var(--accent); color:#0f1220; font-weight:600;
+  }
+  main{ max-width:1100px; margin:0 auto; padding:20px; }
+  .grade{
+    display:grid; gap:16px;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  }
+  .jogo{
+    display:flex; flex-direction:column; gap:8px;
+    background:var(--card); border:1px solid var(--line); border-left:5px solid var(--c,var(--accent));
+    border-radius:14px; padding:18px; text-decoration:none; color:inherit;
+  }
+  .jogo:hover{ border-color:var(--c,var(--accent)); }
+  .jogo h2{ margin:0; font-size:19px; line-height:1.25; }
+  .sub{ color:var(--c,var(--accent)); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.4px; }
+  .desc{ margin:0; color:var(--tx2); font-size:14px; line-height:1.5; flex:1; }
+  .meta{ display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .meta span{
+    font-size:11px; color:var(--tx2); border:1px solid var(--line);
+    padding:3px 9px; border-radius:999px;
+  }
+  .erro{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px; color:var(--tx2); line-height:1.6;
+  }
+  .erro code{ color:var(--tx); }
+  footer{ text-align:center; padding:24px 20px 40px; color:var(--tx2); font-size:13px; }
+  footer a{ color:inherit; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎮 Jogos das Crianças</h1>
+  <p>Todos os jogos em um lugar só — é só tocar para jogar.</p>
+</header>
+
+<div class="filtros" id="filtros"></div>
+
+<main>
+  <div class="grade" id="grade"></div>
+</main>
+
+<footer>
+  Catálogo em <a href="catalogo.json">catalogo.json</a>
+</footer>
+
+<script>
+const grade = document.getElementById('grade');
+const filtros = document.getElementById('filtros');
+let jogos = [], temaAtivo = 'todos';
+
+const TEMAS = {
+  todos:'Todos', ben10:'Ben 10', dragonball:'Dragon Ball',
+  fantasia:'Aventura', infantil:'Infantil', pokemon:'Pokémon', futebol:'Futebol'
+};
+
+function render(){
+  const lista = temaAtivo === 'todos' ? jogos : jogos.filter(j => j.tema === temaAtivo);
+  grade.innerHTML = lista.map(j => `
+    <a class="jogo" style="--c:${j.cor||'#7ed321'}" href="${j.url}" target="_blank" rel="noopener">
+      <span class="sub">${j.subtitulo||''}</span>
+      <h2>${j.nome}</h2>
+      <p class="desc">${j.descricao||''}</p>
+      <div class="meta">
+        <span>👤 ${j.idade||'—'}</span>
+        <span>🎛️ ${j.controle||'—'}</span>
+        ${(j.dispositivo||[]).map(d => `<span>${d}</span>`).join('')}
+      </div>
+    </a>`).join('');
+}
+
+function montarFiltros(){
+  const usados = ['todos', ...new Set(jogos.map(j => j.tema))];
+  filtros.innerHTML = usados.map(t =>
+    `<button data-tema="${t}" aria-pressed="${t===temaAtivo}">${TEMAS[t]||t}</button>`).join('');
+  filtros.querySelectorAll('button').forEach(b => b.onclick = () => {
+    temaAtivo = b.dataset.tema;
+    montarFiltros();
+    render();
+  });
+}
+
+fetch('catalogo.json')
+  .then(r => r.json())
+  .then(d => {
+    // destaques primeiro, mantendo a ordem do catálogo dentro de cada grupo
+    jogos = [...d.jogos].sort((a,b) => (b.destaque===true) - (a.destaque===true));
+    montarFiltros();
+    render();
+  })
+  .catch(() => {
+    grade.innerHTML = `<div class="erro">
+      <strong>Não consegui ler o catalogo.json.</strong><br>
+      Isso acontece quando a página é aberta direto do disco (<code>file://</code>).
+      Publique no GitHub Pages ou rode um servidor local:<br>
+      <code>npx serve .</code> &nbsp;ou&nbsp; <code>python -m http.server</code>
+    </div>`;
+  });
+</script>
+
+</body>
+</html>

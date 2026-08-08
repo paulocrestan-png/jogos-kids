@@ -726,5 +726,7 @@ if(PFX)initPFX();
 function loop(){try{pollPad();update();if(running)draw();if(PFX&&running&&finaleT<=0||PFX&&running)postFX();}catch(e){console.error(e);}tickToast();requestAnimationFrame(loop);}
 resize();loop();
 </script>
+
+<script src="../touch-controls.js"></script>
 </body>
 </html>

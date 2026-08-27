@@ -159,29 +159,6 @@
         "topdown",
         "tibia"
       ]
-    },
-    {
-      "id": "sistema-solar",
-      "nome": "Sistema Solar",
-      "subtitulo": "Planetas, orbitas e a Terra + Lua",
-      "tema": "espaco",
-      "descricao": "Sistema solar interativo: toque nos planetas, veja orbitas, zoom, quiz e a tela especial Terra + Lua com dia e noite.",
-      "url": "https://paulocrestan-png.github.io/jogos-kids/sistema-solar/",
-      "hospedagem": "github-pages",
-      "repo": "paulocrestan-png/jogos-kids",
-      "controle": "toque",
-      "dispositivo": "celular, tablet e computador",
-      "idade": "5+",
-      "orientacao": "qualquer",
-      "offline": true,
-      "destaque": false,
-      "cor": "#3b5bdb",
-      "tags": [
-        "ciencia",
-        "planetas",
-        "espaco",
-        "educativo"
-      ]
     }
   ]
 }

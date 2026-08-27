@@ -1,0 +1,199 @@
+/* Kids Solar System
+   Tudo é isolado pelo prefixo .kss- para evitar conflitos com o projeto principal.
+*/
+.kss-root{
+  --kss-bg:#030611;
+  --kss-panel:#0b1227;
+  --kss-line:#27365f;
+  --kss-txt:#f7f9ff;
+  --kss-muted:#aeb9d8;
+  --kss-yellow:#ffd166;
+  --kss-green:#8be9a8;
+  --kss-blue:#69b7ff;
+  color:var(--kss-txt);
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  width:100%;
+}
+.kss-root *{box-sizing:border-box}
+.kss-shell{
+  background:radial-gradient(circle at 50% 32%,#172655 0,#060a1b 46%,#02040b 100%);
+  border-radius:24px;
+  padding:16px;
+  overflow:hidden;
+}
+.kss-header{text-align:center;padding:4px 8px 10px}
+.kss-header h2{margin:0;font-size:clamp(26px,4vw,44px)}
+.kss-header p{max-width:900px;margin:6px auto 0;color:var(--kss-muted);line-height:1.45}
+.kss-toolbar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;padding:10px 0 14px}
+.kss-btn,.kss-select{
+  border:1px solid #40517f;background:#111a34;color:#fff;border-radius:12px;
+  padding:9px 12px;font-weight:750;cursor:pointer
+}
+.kss-btn:hover{background:#19264b}
+.kss-btn.kss-active{outline:2px solid var(--kss-yellow)}
+.kss-zoom-box{
+  display:flex;align-items:center;gap:6px;background:#0b132b;border:1px solid #314169;
+  padding:5px 7px;border-radius:13px
+}
+.kss-zoom-box input{width:130px}
+.kss-zoom-pct{font-size:12px;min-width:42px;color:#d9e0f7}
+.kss-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.7fr) minmax(315px,.8fr);
+  gap:16px
+}
+.kss-viewport{
+  height:700px;border:1px solid #1d294f;border-radius:23px;overflow:hidden;position:relative;
+  background:
+    radial-gradient(circle at 13% 18%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 79% 24%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 31% 81%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 89% 73%,#fff 0 1px,transparent 1.5px),
+    radial-gradient(circle at 50% 50%,#16234d 0,#080d20 51%,#030611 100%);
+  touch-action:none
+}
+.kss-world{
+  position:absolute;left:50%;top:50%;width:900px;height:900px;
+  transform-origin:center center
+}
+.kss-sun{
+  position:absolute;left:450px;top:450px;width:92px;height:92px;transform:translate(-50%,-50%);
+  border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff9b4,#ffd54d 42%,#ff9a22 72%,#e85f00);
+  box-shadow:0 0 28px #ffc93f,0 0 80px rgba(255,160,35,.58);
+  display:grid;place-items:center;color:#672500;font-weight:950;z-index:5
+}
+.kss-orbit{
+  position:absolute;left:450px;top:450px;border:1px solid rgba(180,200,255,.20);
+  border-radius:50%;transform:translate(-50%,-50%)
+}
+.kss-pwrap{position:absolute;left:450px;top:450px;width:0;height:0;z-index:7;transform-origin:0 0}
+.kss-planet{
+  position:absolute;border:0;padding:0;border-radius:50%;cursor:pointer;
+  box-shadow:0 0 0 2px rgba(255,255,255,.18),0 5px 14px rgba(0,0,0,.4)
+}
+.kss-planet:hover{filter:brightness(1.22);transform:scale(1.12)}
+.kss-plabel{
+  position:absolute;white-space:nowrap;font-size:12px;color:#edf2ff;
+  text-shadow:0 1px 5px #000;pointer-events:none;font-weight:750
+}
+.kss-status,.kss-zoom-hint{
+  position:absolute;z-index:20;background:rgba(4,8,20,.82);
+  border:1px solid #35466f;border-radius:11px;padding:7px 10px;color:#dbe5ff
+}
+.kss-status{top:12px;left:12px;font-size:12px}
+.kss-zoom-hint{bottom:12px;left:12px;font-size:11px}
+.kss-panel{
+  min-height:700px;background:linear-gradient(180deg,#111a36,#070c1d);
+  border:1px solid #293963;border-radius:23px;padding:18px
+}
+.kss-hero{display:flex;gap:13px;align-items:center}
+.kss-bigp{
+  width:80px;height:80px;border-radius:50%;flex:none;
+  box-shadow:inset -13px -11px 17px rgba(0,0,0,.3),0 0 18px rgba(255,255,255,.12)
+}
+.kss-kicker{color:var(--kss-yellow);text-transform:uppercase;font-weight:900;letter-spacing:.07em;font-size:12px}
+.kss-panel h3{font-size:32px;margin:2px 0}
+.kss-nick{color:var(--kss-muted)}
+.kss-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}
+.kss-stat{padding:11px;background:#0b1228;border:1px solid #24345b;border-radius:15px}
+.kss-stat small{color:var(--kss-muted)}
+.kss-stat b{display:block;margin-top:4px;font-size:17px}
+.kss-explain,.kss-why,.kss-deep{line-height:1.48;border-radius:13px;padding:12px 13px}
+.kss-explain{background:#111b39;border-left:4px solid var(--kss-yellow)}
+.kss-why{background:#0d1926;border-left:4px solid #69d49f;margin-top:10px}
+.kss-deep{display:none;margin-top:9px;background:#151126;border:1px solid #493a67}
+.kss-deep.kss-show{display:block}
+.kss-fact{line-height:1.48;margin-top:11px}
+.kss-deep-btn{width:100%;margin-top:10px}
+.kss-tempbar{
+  height:11px;background:linear-gradient(90deg,#4c8dff,#d8e4ff,#ffd166,#ff6246);
+  border-radius:999px;position:relative;margin-top:15px
+}
+.kss-needle{position:absolute;width:4px;height:21px;top:-5px;background:#fff;border-radius:5px}
+.kss-temp-legend{display:flex;justify-content:space-between;font-size:10px;color:var(--kss-muted);margin-top:4px}
+.kss-quiz{margin-top:16px;border-top:1px solid #2a3962;padding-top:14px}
+.kss-quiz h4{margin:0 0 7px}
+.kss-answers{display:grid;gap:7px;margin-top:8px}
+.kss-answers .kss-btn{text-align:left}
+.kss-feedback{min-height:22px;font-weight:800;margin-top:7px}
+
+/* Modal Terra */
+.kss-modal{
+  display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.82);
+  padding:18px;overflow:auto
+}
+.kss-modal.kss-open{display:block}
+.kss-earth-card{
+  max-width:1050px;margin:18px auto;background:#0a1126;border:1px solid #344777;
+  border-radius:24px;padding:18px
+}
+.kss-modal-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.kss-modal-top h3{margin:0;font-size:30px}
+.kss-earth-grid{
+  display:grid;grid-template-columns:minmax(320px,1.15fr) minmax(280px,.85fr);
+  gap:18px;margin-top:14px
+}
+.kss-earth-scene{
+  min-height:520px;border-radius:20px;background:radial-gradient(circle,#12224e,#050918 66%);
+  position:relative;overflow:hidden
+}
+.kss-sun-arrow{position:absolute;left:14px;top:18px;font-weight:850;color:#ffd869}
+.kss-globe-wrap{position:absolute;left:50%;top:50%;width:350px;height:350px;transform:translate(-50%,-50%)}
+.kss-earth-globe{
+  position:absolute;inset:40px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#58d0ff,#1764bd 57%,#092f68);
+  box-shadow:inset -28px -20px 38px rgba(0,0,0,.42),0 0 28px rgba(56,148,255,.2);
+  overflow:hidden
+}
+.kss-continent{position:absolute;background:#58b76a;opacity:.92}
+.kss-sa{
+  width:66px;height:117px;left:111px;top:101px;
+  border-radius:45% 55% 60% 40% / 35% 45% 55% 65%;transform:rotate(-15deg)
+}
+.kss-af{
+  width:68px;height:93px;right:55px;top:83px;border-radius:55% 45% 55% 45%;transform:rotate(12deg)
+}
+.kss-night{
+  position:absolute;inset:-3px;border-radius:50%;
+  background:linear-gradient(90deg,rgba(0,0,18,.83) 0 46%,transparent 53% 100%);
+  transform-origin:center;pointer-events:none
+}
+.kss-brazil{
+  position:absolute;width:14px;height:14px;background:#ffe76b;border:3px solid white;border-radius:50%;
+  left:138px;top:172px;box-shadow:0 0 12px white
+}
+.kss-brazil-label{
+  position:absolute;left:154px;top:169px;font-size:12px;font-weight:900;text-shadow:0 1px 3px #000
+}
+.kss-rot-arrow{
+  position:absolute;inset:13px;border:2px dashed rgba(255,255,255,.35);border-radius:50%;
+  animation:kss-spin 12s linear infinite
+}
+.kss-rot-arrow:after{
+  content:"➤";position:absolute;right:-4px;top:50%;color:#fff;font-size:25px;transform:rotate(90deg)
+}
+.kss-moon-orbit{
+  position:absolute;inset:0;border:1px solid rgba(255,255,255,.25);border-radius:50%;
+  animation:kss-spin 10s linear infinite
+}
+.kss-moon{
+  position:absolute;width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#eee,#aaa 60%,#666);
+  left:calc(100% - 15px);top:50%;transform:translateY(-50%);
+  box-shadow:0 0 8px rgba(255,255,255,.4)
+}
+@keyframes kss-spin{to{transform:rotate(360deg)}}
+.kss-earth-info{line-height:1.5}
+.kss-earth-info h4{margin:4px 0}
+.kss-livebox{background:#101a37;border:1px solid #2d4070;border-radius:15px;padding:12px;margin:10px 0}
+.kss-day-state{font-size:24px;font-weight:900;margin-top:4px}
+.kss-earth-btns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.kss-lesson{background:#0c172b;border-left:4px solid var(--kss-yellow);padding:11px;border-radius:12px;margin-top:10px}
+.kss-footnote{color:#96a4c8;font-size:12px;line-height:1.5;margin-top:12px}
+@media(max-width:900px){
+  .kss-layout{grid-template-columns:1fr}
+  .kss-viewport{height:610px}
+  .kss-panel{min-height:auto}
+  .kss-earth-grid{grid-template-columns:1fr}
+  .kss-earth-scene{min-height:470px}
+}

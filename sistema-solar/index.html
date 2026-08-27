@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Sistema Solar — Malu & Heitor</title>
+  <link rel="stylesheet" href="./solar-system.css">
+  <style>
+    html, body { margin:0; background:#0b1026; min-height:100%; font-family:-apple-system,'Segoe UI',Arial,sans-serif; }
+    .wrap { max-width:1500px; margin:0 auto; padding:10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap"><div id="meu-sistema-solar"></div></div>
+  <script src="./solar-system.js"></script>
+  <script>
+    KidsSolarSystem.mount("#meu-sistema-solar", {
+      title: "🌞 Sistema Solar",
+      subtitle: "Toque nos planetas para aprender brincando!",
+      timezone: "America/Sao_Paulo",
+      brazilLabel: "Brasil 🇧🇷"
+    });
+  </script>
+</body>
+</html>

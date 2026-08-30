@@ -27,7 +27,7 @@ jogos
 |---|---|
 | `id` | identificador estável (não muda entre versões) |
 | `nome` / `subtitulo` | título e linha de apoio |
-| `tema` | `ben10`, `dragonball`, `fantasia`, `infantil`, `pokemon`, `futebol` |
+| `tema` | `ben10`, `dragonball`, `fantasia`, `infantil`, `pokemon`, `futebol`, `gosh` |
 | `descricao` | resumo do que o jogo é |
 | `url` | **link para abrir o jogo** |
 | `caminho` | pasta dentro deste repo (só para os jogos hospedados aqui) |
@@ -64,6 +64,7 @@ Ficam fora deste repo por terem pipeline de build ou arte pesada, mas estão no 
 | Jogo | Link | Repo |
 |---|---|---|
 | Ben 10 — Força Alien (13 minijogos) | https://paulocrestan-png.github.io/ben10-jogos/ | `ben10-jogos` |
+| Jogos do Gosh (5 minijogos) | https://paulocrestan-png.github.io/feira-dino-arcade/ | `feira-dino-arcade` |
 | VEYRA (RPG isométrico) | https://paulocrestan-png.github.io/veyra-tester/ | `veyra-tester` |
 | Pokémon TCG | https://paulocrestan-png.github.io/pokemon-tcg/ | `pokemon-tcg` |
 | Álbum Copa 2026 | https://paulocrestan-png.github.io/album-copa-2026/ | `album-copa-2026` |

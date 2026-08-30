@@ -1,8 +1,39 @@
 {
-  "versao": 1,
-  "atualizado": "2026-08-08",
+  "versao": 2,
+  "atualizado": "2026-08-30",
   "base": "https://paulocrestan-png.github.io/jogos-kids/",
   "jogos": [
+    {
+      "id": "gosh-arcade",
+      "nome": "Jogos do Gosh",
+      "subtitulo": "5 minijogos",
+      "tema": "gosh",
+      "descricao": "Coletânea de 5 minijogos do Gosh, o dinossauro: Corrida do Gosh (plataforma), Doce Pré-histórico (combine 3), Blocos do Gosh (tetris), Rummikub Dino e Sequence Dino (contra o Gosh).",
+      "url": "https://paulocrestan-png.github.io/feira-dino-arcade/",
+      "hospedagem": "externa",
+      "repo": "https://github.com/paulocrestan-png/feira-dino-arcade",
+      "controle": "toque + teclado",
+      "dispositivo": [
+        "pc",
+        "tablet",
+        "celular"
+      ],
+      "idade": "5+",
+      "orientacao": "qualquer",
+      "offline": true,
+      "destaque": true,
+      "cor": "#3d8b53",
+      "tags": [
+        "gosh",
+        "dinossauro",
+        "arcade",
+        "plataforma",
+        "combine3",
+        "tetris",
+        "rummikub",
+        "sequence"
+      ]
+    },
     {
       "id": "ben10-forca-alien",
       "nome": "Ben 10 — Força Alien",

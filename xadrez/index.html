@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Xadrez do Gosh</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #2e2924;
+      background: #f5f1e9;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: linear-gradient(160deg, #fffdf8 0%, #eee6d9 100%);
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 16px;
+      font: inherit;
+      font-weight: 750;
+      color: #fff;
+      background: #5c4b37;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible { outline: 3px solid #f2b84b; outline-offset: 2px; }
+    button:disabled { cursor: default; opacity: .45; }
+
+    .screen {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    #start-screen {
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .start-card {
+      width: min(100%, 460px);
+      padding: clamp(22px, 7vw, 42px);
+      border: 1px solid #ded2c0;
+      border-radius: 24px;
+      text-align: center;
+      background: rgba(255, 253, 248, .95);
+      box-shadow: 0 18px 50px rgba(64, 47, 29, .16);
+    }
+
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 9vw, 3rem); }
+    .subtitle { margin: 0 0 26px; color: #6d6258; }
+    .option-title { margin: 20px 0 8px; font-size: .9rem; font-weight: 800; }
+
+    .segments {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 5px;
+      border-radius: 14px;
+      background: #e8dfd2;
+    }
+
+    .segments.two { grid-template-columns: repeat(2, 1fr); }
+    .segments button { min-width: 0; padding-inline: 6px; color: #4a3b2b; background: transparent; }
+    .segments button.active { color: #fff; background: #806848; box-shadow: 0 2px 6px rgba(0, 0, 0, .16); }
+
+    .mode-buttons { display: grid; gap: 10px; margin-top: 24px; }
+    .mode-buttons button { width: 100%; font-size: 1.05rem; }
+    #start-two { color: #443827; background: #dfc58f; }
+
+    #game-screen {
+      display: none;
+      align-content: start;
+      justify-items: center;
+      padding: 8px 8px 12px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: min(calc(100vw - 16px), 560px);
+      min-height: 43px;
+      font-size: clamp(1rem, 4.5vw, 1.25rem);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .check-text { margin-left: 7px; color: #b32222; }
+
+    .captured {
+      width: min(calc(100vw - 16px), 560px);
+      min-height: 25px;
+      padding: 1px 4px;
+      overflow: hidden;
+      color: #42372c;
+      font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", serif;
+      font-size: 20px;
+      line-height: 23px;
+      white-space: nowrap;
+    }
+
+    #captured-bottom { text-align: right; }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: min(calc(100vw - 16px), calc(100vh - 230px), 560px);
+      width: min(calc(100vw - 16px), calc(100dvh - 230px), 560px);
+      min-width: 280px;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border: 3px solid #5c4b37;
+      border-radius: 5px;
+      box-shadow: 0 8px 22px rgba(46, 34, 22, .2);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .square {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      border: 0;
+    }
+
+    .light { background: #f0d9b5; }
+    .dark { background: #b58863; }
+    .square.last { box-shadow: inset 0 0 0 999px rgba(248, 223, 65, .28); }
+    .square.selected { box-shadow: inset 0 0 0 4px #f4d03f, inset 0 0 0 999px rgba(255, 234, 94, .32); }
+    .square.check { box-shadow: inset 0 0 0 999px rgba(218, 49, 49, .48); }
+
+    .square.legal-empty::after {
+      content: "";
+      position: absolute;
+      width: 23%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(38, 55, 35, .48);
+    }
+
+    .square.legal-capture::after {
+      content: "";
+      position: absolute;
+      inset: 5%;
+      border: clamp(3px, .8vw, 6px) solid rgba(125, 35, 27, .72);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .piece {
+      position: relative;
+      z-index: 1;
+      font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "DejaVu Sans", serif;
+      font-size: clamp(30px, 70%, 66px);
+      line-height: 1;
+      pointer-events: none;
+      transform: translateY(-1%);
+    }
+
+    .piece.white { color: #fff; text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333, 0 2px 2px #333; }
+    .piece.black { color: #1a1a1a; text-shadow: 0 1px 1px rgba(255,255,255,.28); }
+
+    .coord {
+      position: absolute;
+      z-index: 2;
+      font-size: clamp(8px, 1.8vw, 11px);
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .coord.file { right: 3px; bottom: 1px; }
+    .coord.rank { top: 1px; left: 3px; }
+    .light .coord { color: #8b6548; }
+    .dark .coord { color: #f0d9b5; }
+
+    .game-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      width: min(calc(100vw - 16px), 560px);
+      margin-top: 8px;
+    }
+
+    .game-actions button { padding: 7px 10px; }
+    #new-game { background: #806848; }
+
+    #end-overlay {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(34, 27, 20, .65);
+    }
+
+    .end-card {
+      width: min(100%, 420px);
+      padding: 28px;
+      border-radius: 20px;
+      text-align: center;
+      background: #fffdf8;
+      box-shadow: 0 18px 55px rgba(0, 0, 0, .3);
+    }
+
+    #end-message { margin: 0 0 20px; font-size: clamp(1.35rem, 6vw, 2rem); }
+
+    @media (max-height: 560px) and (orientation: landscape) {
+      #game-screen { grid-template-columns: 1fr auto 1fr; align-items: center; }
+      .status, .captured, .game-actions { width: min(30vw, 230px); }
+      .status, #captured-top { grid-column: 1; }
+      #board { grid-column: 2; grid-row: 1 / span 4; width: min(calc(100vh - 16px), 560px); min-width: 0; }
+      #captured-bottom, .game-actions { grid-column: 3; }
+      .game-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="screen" id="start-screen">
+    <section class="start-card" aria-labelledby="game-title">
+      <h1 id="game-title">Xadrez do Gosh</h1>
+      <p class="subtitle">Escolha como você quer jogar.</p>
+
+      <p class="option-title">Nível do computador</p>
+      <div class="segments" id="level-options" aria-label="Nível do computador">
+        <button class="active" type="button" data-level="facil" aria-pressed="true">Fácil</button>
+        <button type="button" data-level="medio" aria-pressed="false">Médio</button>
+        <button type="button" data-level="dificil" aria-pressed="false">Difícil</button>
+      </div>
+
+      <p class="option-title">Jogar de</p>
+      <div class="segments two" id="color-options" aria-label="Escolha sua cor">
+        <button class="active" type="button" data-color="w" aria-pressed="true">Brancas</button>
+        <button type="button" data-color="b" aria-pressed="false">Pretas</button>
+      </div>
+
+      <div class="mode-buttons">
+        <button id="start-computer" type="button">🤖 Contra o computador</button>
+        <button id="start-two" type="button">👫 Dois jogadores</button>
+      </div>
+    </section>
+  </main>
+
+  <main class="screen" id="game-screen">
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="captured" id="captured-top" aria-label="Peças capturadas pelas brancas"></div>
+    <div id="board" role="grid" aria-label="Tabuleiro de xadrez"></div>
+    <div class="captured" id="captured-bottom" aria-label="Peças capturadas pelas pretas"></div>
+    <div class="game-actions">
+      <button id="undo" type="button">↩️ Desfazer</button>
+      <button id="new-game" type="button">🔄 Novo jogo</button>
+    </div>
+  </main>
+
+  <div id="end-overlay" role="dialog" aria-modal="true" aria-labelledby="end-message">
+    <section class="end-card">
+      <h2 id="end-message"></h2>
+      <button id="play-again" type="button">Jogar de novo</button>
+    </section>
+  </div>
+
+  <script src="./chess.min.js"></script>
+  <script id="xadrez-ia">
+    const XadrezIA = {
+      VALOR: { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 },
+
+      avaliar(chess) {
+        if (chess.in_checkmate()) return chess.turn() === 'w' ? -10000 : 10000;
+        if (chess.in_stalemate() || chess.in_draw()) return 0;
+
+        let total = 0;
+        const tabuleiro = chess.board();
+        for (const linha of tabuleiro) {
+          for (const peca of linha) {
+            if (peca) total += (peca.color === 'w' ? 1 : -1) * this.VALOR[peca.type];
+          }
+        }
+        return total;
+      },
+
+      pontuar(chess, distancia) {
+        const nota = this.avaliar(chess);
+        if (nota === 10000) return 10000 - distancia;
+        if (nota === -10000) return -10000 + distancia;
+        return nota;
+      },
+
+      ordenar(lances) {
+        return lances.slice().sort((a, b) => {
+          const notaA = (a.captured ? 100 + this.VALOR[a.captured] * 10 - this.VALOR[a.piece] : 0) + (a.promotion ? 90 : 0);
+          const notaB = (b.captured ? 100 + this.VALOR[b.captured] * 10 - this.VALOR[b.piece] : 0) + (b.promotion ? 90 : 0);
+          return notaB - notaA;
+        });
+      },
+
+      minimax(chess, restante, alfa, beta, distancia, limite, ordenarLances) {
+        if (Date.now() >= limite) throw 'tempo-esgotado';
+        if (restante === 0 || chess.game_over()) return this.pontuar(chess, distancia);
+
+        let lances = chess.moves({ verbose: true });
+        if (ordenarLances) lances = this.ordenar(lances);
+        const maximiza = chess.turn() === 'w';
+        let melhor = maximiza ? -Infinity : Infinity;
+
+        for (const lance of lances) {
+          if (Date.now() >= limite) throw 'tempo-esgotado';
+          chess.move({ from: lance.from, to: lance.to, promotion: lance.promotion ? 'q' : undefined });
+          let nota;
+          try {
+            nota = this.minimax(chess, restante - 1, alfa, beta, distancia + 1, limite, ordenarLances);
+          } finally {
+            chess.undo();
+          }
+
+          if (maximiza) {
+            melhor = Math.max(melhor, nota);
+            alfa = Math.max(alfa, melhor);
+          } else {
+            melhor = Math.min(melhor, nota);
+            beta = Math.min(beta, melhor);
+          }
+          if (beta <= alfa) break;
+        }
+        return melhor;
+      },
+
+      buscarNaProfundidade(chess, profundidade, limite, comPoda) {
+        const maximiza = chess.turn() === 'w';
+        const lances = comPoda ? this.ordenar(chess.moves({ verbose: true })) : chess.moves({ verbose: true });
+        let melhorNota = maximiza ? -Infinity : Infinity;
+        let melhores = [];
+
+        for (const lance of lances) {
+          if (Date.now() >= limite) throw 'tempo-esgotado';
+          chess.move({ from: lance.from, to: lance.to, promotion: lance.promotion ? 'q' : undefined });
+          let nota;
+          try {
+            nota = this.minimax(chess, profundidade - 1, -Infinity, Infinity, 1, limite, comPoda);
+          } finally {
+            chess.undo();
+          }
+
+          const melhorou = maximiza ? nota > melhorNota : nota < melhorNota;
+          if (melhorou) {
+            melhorNota = nota;
+            melhores = [lance];
+          } else if (nota === melhorNota) {
+            melhores.push(lance);
+          }
+        }
+
+        return melhores[Math.floor(Math.random() * melhores.length)] || null;
+      },
+
+      normalizar(lance) {
+        if (!lance) return null;
+        return {
+          from: lance.from,
+          to: lance.to,
+          promotion: lance.promotion ? 'q' : undefined
+        };
+      },
+
+      escolherLance(chess, nivel, opcoes) {
+        if (chess.game_over()) return null;
+        const lances = chess.moves({ verbose: true });
+        if (!lances.length) return null;
+
+        if (nivel === 'facil') {
+          const capturas = lances.filter(lance => lance.captured);
+          const candidatos = capturas.length ? capturas : lances;
+          return this.normalizar(candidatos[Math.floor(Math.random() * candidatos.length)]);
+        }
+
+        if (nivel === 'medio') {
+          const lance = this.buscarNaProfundidade(chess, 2, Infinity, false);
+          return this.normalizar(lance);
+        }
+
+        const tempoMaxMs = opcoes && Number.isFinite(opcoes.tempoMaxMs) ? Math.max(1, opcoes.tempoMaxMs) : 2500;
+        const limite = Date.now() + tempoMaxMs;
+        let ultimoCompleto = lances[0];
+
+        for (let profundidade = 1; profundidade <= 3; profundidade += 1) {
+          try {
+            const lance = this.buscarNaProfundidade(chess, profundidade, limite, true);
+            if (lance) ultimoCompleto = lance;
+          } catch (erro) {
+            if (erro !== 'tempo-esgotado') throw erro;
+            break;
+          }
+        }
+        return this.normalizar(ultimoCompleto);
+      }
+    };
+
+    globalThis.XadrezIA = XadrezIA;
+  </script>
+  <script id="xadrez-ui">
+    (() => {
+      const GLIFOS = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+      const chess = new Chess();
+      const startScreen = document.getElementById('start-screen');
+      const gameScreen = document.getElementById('game-screen');
+      const board = document.getElementById('board');
+      const status = document.getElementById('status');
+      const undoButton = document.getElementById('undo');
+      const endOverlay = document.getElementById('end-overlay');
+      const endMessage = document.getElementById('end-message');
+
+      let mode = 'computer';
+      let level = 'facil';
+      let humanColor = 'w';
+      let selected = null;
+      let legalMoves = [];
+      let lastMove = null;
+      let aiTimer = null;
+      let thinking = false;
+
+      function cancelComputer() {
+        if (aiTimer !== null) clearTimeout(aiTimer);
+        aiTimer = null;
+        thinking = false;
+      }
+
+      function filesAndRanks() {
+        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
+        if (mode === 'computer' && humanColor === 'b') {
+          files.reverse();
+          ranks.reverse();
+        }
+        return { files, ranks };
+      }
+
+      function checkedKingSquare() {
+        if (!chess.in_check() || chess.game_over()) return null;
+        const position = chess.board();
+        for (let row = 0; row < position.length; row += 1) {
+          for (let col = 0; col < position[row].length; col += 1) {
+            const piece = position[row][col];
+            if (piece && piece.type === 'k' && piece.color === chess.turn()) {
+              return 'abcdefgh'[col] + (8 - row);
+            }
+          }
+        }
+        return null;
+      }
+
+      function renderBoard() {
+        board.textContent = '';
+        const { files, ranks } = filesAndRanks();
+        const kingInCheck = checkedKingSquare();
+
+        for (let row = 0; row < 8; row += 1) {
+          for (let col = 0; col < 8; col += 1) {
+            const squareName = files[col] + ranks[row];
+            const naturalFile = files[col].charCodeAt(0) - 97;
+            const naturalRank = Number(ranks[row]);
+            const square = document.createElement('div');
+            const target = legalMoves.find(move => move.to === squareName);
+            square.className = `square ${(naturalFile + naturalRank) % 2 === 0 ? 'dark' : 'light'}`;
+            square.dataset.square = squareName;
+            square.setAttribute('role', 'gridcell');
+            square.setAttribute('aria-label', squareName);
+
+            if (selected === squareName) square.classList.add('selected');
+            if (lastMove && (lastMove.from === squareName || lastMove.to === squareName)) square.classList.add('last');
+            if (kingInCheck === squareName) square.classList.add('check');
+            if (target) square.classList.add(target.captured ? 'legal-capture' : 'legal-empty');
+
+            const piece = chess.get(squareName);
+            if (piece) {
+              const span = document.createElement('span');
+              span.className = `piece ${piece.color === 'w' ? 'white' : 'black'}`;
+              span.textContent = GLIFOS[piece.type];
+              square.appendChild(span);
+            }
+
+            if (row === 7) {
+              const fileLabel = document.createElement('span');
+              fileLabel.className = 'coord file';
+              fileLabel.textContent = files[col];
+              square.appendChild(fileLabel);
+            }
+            if (col === 0) {
+              const rankLabel = document.createElement('span');
+              rankLabel.className = 'coord rank';
+              rankLabel.textContent = ranks[row];
+              square.appendChild(rankLabel);
+            }
+            board.appendChild(square);
+          }
+        }
+      }
+
+      function renderCaptured() {
+        const capturedByWhite = [];
+        const capturedByBlack = [];
+        for (const move of chess.history({ verbose: true })) {
+          if (!move.captured) continue;
+          const target = move.color === 'w' ? capturedByWhite : capturedByBlack;
+          target.push(GLIFOS[move.captured]);
+        }
+        document.getElementById('captured-top').textContent = capturedByWhite.join(' ');
+        document.getElementById('captured-bottom').textContent = capturedByBlack.join(' ');
+      }
+
+      function resultText() {
+        if (chess.in_stalemate()) return 'Empate por afogamento';
+        if (chess.in_draw()) return 'Empate';
+        if (!chess.in_checkmate()) return '';
+
+        const winner = chess.turn() === 'w' ? 'b' : 'w';
+        if (mode === 'computer') {
+          return winner === humanColor ? 'Xeque-mate! Você ganhou 🏆' : 'Xeque-mate! O computador ganhou';
+        }
+        return winner === 'w' ? 'Xeque-mate! As Brancas ganharam 🏆' : 'Xeque-mate! As Pretas ganharam 🏆';
+      }
+
+      function renderStatus() {
+        status.textContent = '';
+        let text;
+        if (chess.game_over()) {
+          text = resultText();
+        } else if (mode === 'computer') {
+          text = thinking || chess.turn() !== humanColor ? 'Computador pensando…' : 'Sua vez';
+        } else {
+          text = chess.turn() === 'w' ? 'Vez das Brancas' : 'Vez das Pretas';
+        }
+        status.append(document.createTextNode(text));
+
+        if (!chess.game_over() && chess.in_check()) {
+          const check = document.createElement('span');
+          check.className = 'check-text';
+          check.textContent = 'Xeque!';
+          status.appendChild(check);
+        }
+      }
+
+      function render() {
+        renderBoard();
+        renderCaptured();
+        renderStatus();
+        undoButton.disabled = chess.history().length === 0;
+
+        if (chess.game_over()) {
+          cancelComputer();
+          endMessage.textContent = resultText();
+          endOverlay.style.display = 'grid';
+        } else {
+          endOverlay.style.display = 'none';
+        }
+      }
+
+      function scheduleComputer() {
+        if (mode !== 'computer' || chess.game_over() || chess.turn() === humanColor || aiTimer !== null) return;
+        thinking = true;
+        render();
+        const delay = 300 + Math.floor(Math.random() * 301);
+        aiTimer = setTimeout(() => {
+          aiTimer = null;
+          const move = XadrezIA.escolherLance(chess, level);
+          if (move && !chess.game_over()) lastMove = chess.move(move);
+          thinking = false;
+          selected = null;
+          legalMoves = [];
+          render();
+        }, delay);
+      }
+
+      function startGame(chosenMode) {
+        cancelComputer();
+        mode = chosenMode;
+        chess.reset();
+        selected = null;
+        legalMoves = [];
+        lastMove = null;
+        endOverlay.style.display = 'none';
+        startScreen.style.display = 'none';
+        gameScreen.style.display = 'grid';
+        render();
+        scheduleComputer();
+      }
+
+      function returnToStart() {
+        cancelComputer();
+        chess.reset();
+        selected = null;
+        legalMoves = [];
+        lastMove = null;
+        endOverlay.style.display = 'none';
+        gameScreen.style.display = 'none';
+        startScreen.style.display = 'grid';
+      }
+
+      board.addEventListener('click', event => {
+        const squareElement = event.target.closest('.square');
+        if (!squareElement || chess.game_over() || thinking) return;
+        if (mode === 'computer' && chess.turn() !== humanColor) return;
+
+        const squareName = squareElement.dataset.square;
+        const piece = chess.get(squareName);
+        const legalTarget = legalMoves.find(move => move.to === squareName);
+
+        if (selected && legalTarget) {
+          lastMove = chess.move({ from: selected, to: squareName, promotion: 'q' });
+          selected = null;
+          legalMoves = [];
+          render();
+          scheduleComputer();
+          return;
+        }
+
+        if (piece && piece.color === chess.turn()) {
+          selected = squareName;
+          legalMoves = chess.moves({ square: squareName, verbose: true });
+        } else {
+          selected = null;
+          legalMoves = [];
+        }
+        render();
+      });
+
+      document.getElementById('level-options').addEventListener('click', event => {
+        const button = event.target.closest('[data-level]');
+        if (!button) return;
+        level = button.dataset.level;
+        for (const option of document.querySelectorAll('[data-level]')) {
+          const active = option === button;
+          option.classList.toggle('active', active);
+          option.setAttribute('aria-pressed', String(active));
+        }
+      });
+
+      document.getElementById('color-options').addEventListener('click', event => {
+        const button = event.target.closest('[data-color]');
+        if (!button) return;
+        humanColor = button.dataset.color;
+        for (const option of document.querySelectorAll('[data-color]')) {
+          const active = option === button;
+          option.classList.toggle('active', active);
+          option.setAttribute('aria-pressed', String(active));
+        }
+      });
+
+      document.getElementById('start-computer').addEventListener('click', () => startGame('computer'));
+      document.getElementById('start-two').addEventListener('click', () => startGame('two'));
+      document.getElementById('new-game').addEventListener('click', returnToStart);
+      document.getElementById('play-again').addEventListener('click', () => startGame(mode));
+
+      undoButton.addEventListener('click', () => {
+        cancelComputer();
+        const count = mode === 'computer' ? Math.min(2, chess.history().length) : Math.min(1, chess.history().length);
+        for (let index = 0; index < count; index += 1) chess.undo();
+        selected = null;
+        legalMoves = [];
+        lastMove = null;
+        endOverlay.style.display = 'none';
+        render();
+        scheduleComputer();
+      });
+    })();
+  </script>
+</body>
+</html>

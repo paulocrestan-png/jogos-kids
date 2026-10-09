@@ -190,6 +190,29 @@
         "topdown",
         "tibia"
       ]
+    },
+    {
+      "id": "xadrez-gosh",
+      "nome": "Xadrez do Gosh",
+      "subtitulo": "Contra o computador ou um amigo",
+      "tema": "tabuleiro",
+      "descricao": "Xadrez de verdade para jogar no toque: contra o computador em 3 níveis ou com um amigo no mesmo aparelho.",
+      "url": "https://paulocrestan-png.github.io/jogos-kids/xadrez/",
+      "hospedagem": "github-pages",
+      "repo": "paulocrestan-png/jogos-kids",
+      "controle": "toque",
+      "dispositivo": "celular, tablet e computador",
+      "idade": "6+",
+      "orientacao": "qualquer",
+      "offline": true,
+      "destaque": false,
+      "cor": "#5c4b37",
+      "tags": [
+        "xadrez",
+        "tabuleiro",
+        "estrategia",
+        "educativo"
+      ]
     }
   ]
 }
